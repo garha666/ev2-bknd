@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -18,34 +19,46 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
-SECRET_KEY = 'django-insecure-xrvzw)%-uecfa-xa#-5z$yi@7$ugt)(01min-=1(#ue))g7w-1'
+# Los valores sensibles se leen de variables de entorno; los defaults permiten
+# ejecutar el proyecto en local sin configuración adicional.
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-xrvzw)%-uecfa-xa#-5z$yi@7$ugt)(01min-=1(#ue))g7w-1',
+)
 
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('1', 'true', 'yes')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(',')
+    if host.strip()
+]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # Third-party apps (Coma agregada para evitar el ModuleNotFoundError)
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'django_filters',
     'drf_spectacular',
-    
+
     # Local apps
     'tickets',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -76,14 +89,16 @@ WSGI_APPLICATION = 'ticket_project.wsgi.application'
 
 
 # Database
+# Motor PostgreSQL nativo (prohibido SQLite en la pauta). La configuración se
+# puede sobreescribir mediante variables de entorno en cada despliegue.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'tickets_db',
-        'USER': 'postgres',
-        'PASSWORD': 'postgresql',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': os.environ.get('DB_NAME', 'tickets_db'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'postgresql'),
+        'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -106,12 +121,14 @@ REST_FRAMEWORK = {
 # OpenAPI / Swagger UI Settings
 SPECTACULAR_SETTINGS = {
     'TITLE': 'API de Venta de Entradas y Eventos',
-    'DESCRIPTION': 'Documentación interactiva de la API de gestión de entradas, eventos, carrito y ventas.',
-    '------------------------------------------------------'
-        'Alumno: Matías Antonio Gubelin Ramírez'
-        'Sección: IEC-N4-C1'
-        'Año: 2026'
-        '--------------------------------------------------'
+    'DESCRIPTION': (
+        'Documentación interactiva de la API de gestión de entradas, eventos, carrito y ventas.\n\n'
+        '------------------------------------------------------\n'
+        'Alumno: Matías Antonio Gubelin Ramírez\n'
+        'Sección: IEC-N4-C1\n'
+        'Año: 2026\n'
+        '------------------------------------------------------'
+    ),
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
@@ -159,5 +176,9 @@ STATIC_URL = 'static/'
 
 # Email Config
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+CORS_ALLOW_ALL_ORIGINS = os.environ.get(
+    'CORS_ALLOW_ALL_ORIGINS', 'True'
+).lower() in ('1', 'true', 'yes')  # Permite todas las peticiones durante el desarrollo
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

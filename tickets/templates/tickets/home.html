@@ -1,0 +1,30 @@
+{% extends "tickets/base.html" %}
+
+{% block title %}Plataforma de Entradas - EVA-2{% endblock %}
+
+{% block content %}
+    <h1>Plataforma de Venta de Entradas</h1>
+    <p>
+        Backend desarrollado con Django REST Framework y PostgreSQL para la
+        evaluación EVA-2. Gestión de eventos, sectores, carro persistente,
+        checkout transaccional y emisión de entradas con UUID.
+    </p>
+
+    <div class="card">
+        <h2>Recursos de la API</h2>
+        <ul>
+            <li><a href="/api/docs/">Documentación Swagger / OpenAPI</a></li>
+            <li><a href="/api/status/">Estado del sistema y datos del alumno</a></li>
+            <li><a href="/api/eventos/">Catálogo de eventos (público)</a></li>
+            <li><a href="/api/auth/login/">Autenticación JWT</a></li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>Endpoints principales</h2>
+        <p><code>GET /api/eventos/</code> · <code>GET /api/eventos/{id}/sectores/</code></p>
+        <p><code>GET/POST /api/carro-tickets/</code> · <code>DELETE /api/carro-tickets/{id}/</code></p>
+        <p><code>POST /api/compras/pagar/</code> · <code>PATCH /api/compras/{id}/estado/</code></p>
+        <p><code>GET /api/mis-entradas/</code></p>
+    </div>
+{% endblock %}

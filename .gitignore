@@ -1,0 +1,55 @@
+# ============================================================================
+# .gitignore — EVA-2 Backend
+# ============================================================================
+
+# Entornos virtuales
+env/
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+/media/
+/staticfiles/
+schema_check.yaml
+schema.yaml
+
+# Variables de entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.idea/
+*.swp
+
+# Material de la asignatura y archivos locales (no forman parte del entregable)
+CALSES UNI/
+.agents/
+.claude/
+skills-lock.json
+
+# Artefactos accidentales de pruebas
+stress_/
+stress_test.py`
+
+# Herramientas de IA / notas locales
+CLAUDE.md
+MEMORY.md

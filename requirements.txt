@@ -1,0 +1,15 @@
+# Dependencias del backend EVA-2 (Plataforma de Venta de Entradas)
+# Instalar con: pip install -r requirements.txt
+
+Django==6.1.1
+djangorestframework==3.18.1
+djangorestframework-simplejwt==5.5.1
+django-filter==26.1
+drf-spectacular==0.30.0
+django-cors-headers==4.9.0
+psycopg2-binary==2.9.13
+PyJWT==2.15.1
+tzdata==2026.4
+
+# Herramienta opcional de prueba de concurrencia (stress_test.py)
+requests>=2.31
