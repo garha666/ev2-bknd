@@ -1,0 +1,35 @@
+{% extends "tickets/base.html" %}
+
+{% block title %}Ingresar · Plataforma de Entradas{% endblock %}
+
+{% block content %}
+    <h1 class="center">Ingresar</h1>
+
+    <form class="card auth-card" method="post" action="{% url 'web:login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="message error">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}
+                    <p class="error">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <button class="btn btn-primary btn-block" type="submit">Entrar</button>
+    </form>
+
+    <p class="muted center">
+        ¿No tienes cuenta? <a href="{% url 'web:register' %}">Regístrate</a>
+    </p>
+    <p class="muted center">
+        ¿Eres organizador? Ingresa con tu usuario staff y accede al
+        <a href="{% url 'web:panel' %}">panel</a>.
+    </p>
+{% endblock %}

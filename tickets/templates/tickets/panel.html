@@ -1,0 +1,93 @@
+{% extends "tickets/base.html" %}
+
+{% block title %}Panel del organizador · Plataforma de Entradas{% endblock %}
+
+{% block content %}
+    <h1>Panel del organizador</h1>
+    <p class="muted">
+        Gestión de eventos, sectores y estados de órdenes. Sólo usuarios con
+        <code>is_staff</code> pueden acceder a este panel.
+    </p>
+
+    <div class="grid two">
+        <section class="card">
+            <h2>Crear evento</h2>
+            <form method="post" action="{% url 'web:panel_event_create' %}">
+                {% csrf_token %}
+                {{ event_form.as_p }}
+                <button class="btn btn-primary" type="submit">Crear evento</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Crear sector</h2>
+            <form method="post" action="{% url 'web:panel_sector_create' %}">
+                {% csrf_token %}
+                {{ sector_form.as_p }}
+                <button class="btn btn-primary" type="submit">Crear sector</button>
+            </form>
+        </section>
+    </div>
+
+    <h2>Órdenes</h2>
+    {% if orders_with_forms %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Orden</th>
+                    <th>Cliente</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                    <th>Fecha</th>
+                    <th>Cambiar estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order, form in orders_with_forms %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.user.username }}</td>
+                        <td><span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                        <td>${{ order.total_amount }}</td>
+                        <td>{{ order.created_at|date:"d M Y H:i" }}</td>
+                        <td>
+                            <form class="inline-form" method="post" action="{% url 'web:panel_order_status' order.id %}">
+                                {% csrf_token %}
+                                {{ form.status }}
+                                <button class="btn btn-primary btn-sm" type="submit">Actualizar</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">No hay órdenes registradas.</div>
+    {% endif %}
+
+    <h2>Eventos</h2>
+    {% if events %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Evento</th>
+                    <th>Recinto</th>
+                    <th>Fecha</th>
+                    <th>Sectores</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                    <tr>
+                        <td>{{ event.title }}</td>
+                        <td>{{ event.venue.name }}</td>
+                        <td>{{ event.date|date:"d M Y H:i" }}</td>
+                        <td>{{ event.sectors.count }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">Aún no hay eventos. Crea el primero arriba.</div>
+    {% endif %}
+{% endblock %}

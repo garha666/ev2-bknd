@@ -1,0 +1,57 @@
+{% extends "tickets/base.html" %}
+
+{% block title %}Mi carro · Plataforma de Entradas{% endblock %}
+
+{% block content %}
+    <h1>Tu carro</h1>
+
+    {% if items %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Evento</th>
+                    <th>Sector</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>{{ item.sector.event.title }}</td>
+                        <td>{{ item.sector.name }}</td>
+                        <td>${{ item.sector.price }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ item.subtotal }}</td>
+                        <td>
+                            <form method="post" action="{% url 'web:remove_from_cart' item.id %}">
+                                {% csrf_token %}
+                                <button class="btn btn-danger btn-sm" type="submit">Quitar</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="cart-total">
+            <p>Total: <strong>${{ total }}</strong></p>
+            <form method="post" action="{% url 'web:checkout' %}">
+                {% csrf_token %}
+                <button class="btn btn-primary" type="submit">Generar orden</button>
+            </form>
+        </div>
+
+        <p class="muted">
+            El stock se descuenta únicamente al pagar la orden. Si el stock ya no alcanza,
+            el pago será rechazado.
+        </p>
+    {% else %}
+        <div class="empty">
+            Tu carro está vacío.
+            <p><a href="{% url 'web:home' %}">Explorar eventos</a></p>
+        </div>
+    {% endif %}
+{% endblock %}

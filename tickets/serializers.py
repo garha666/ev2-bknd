@@ -48,7 +48,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """JWT con claims de rol exigidos por el Spec 001."""
+    """JWT con claims de rol exigidos por el Spec 001.
+
+    Los claims viajan dentro del token y, además, se exponen en el cuerpo de la
+    respuesta del login para facilitar el consumo desde el frontend.
+    """
 
     @classmethod
     def get_token(cls, user):
@@ -57,6 +61,13 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['is_staff'] = user.is_staff
         token['role'] = 'Organizador' if user.is_staff else 'Espectador'
         return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data['username'] = self.user.username
+        data['is_staff'] = self.user.is_staff
+        data['role'] = 'Organizador' if self.user.is_staff else 'Espectador'
+        return data
 
 
 # ============================================================================

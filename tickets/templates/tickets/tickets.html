@@ -1,0 +1,32 @@
+{% extends "tickets/base.html" %}
+
+{% block title %}Mis entradas · Plataforma de Entradas{% endblock %}
+
+{% block content %}
+    <h1>Mis entradas</h1>
+
+    {% if tickets %}
+        <div class="grid">
+            {% for ticket in tickets %}
+                <article class="card ticket-card">
+                    <div class="ticket-top">
+                        <span class="badge badge-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
+                        <span class="muted">{{ ticket.issued_at|date:"d M Y" }}</span>
+                    </div>
+                    <h3>{{ ticket.sector.event.title }}</h3>
+                    <p class="muted">
+                        {{ ticket.sector.name }} ·
+                        {{ ticket.sector.event.date|date:"d M Y · H:i" }}
+                    </p>
+                    <p class="muted">Orden #{{ ticket.order_item.order.id }}</p>
+                    <code class="uuid">{{ ticket.ticket_code }}</code>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty">
+            Aún no tienes entradas.
+            <p><a href="{% url 'web:home' %}">Compra la primera</a></p>
+        </div>
+    {% endif %}
+{% endblock %}

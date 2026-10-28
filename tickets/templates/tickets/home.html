@@ -1,30 +1,72 @@
 {% extends "tickets/base.html" %}
 
-{% block title %}Plataforma de Entradas - EVA-2{% endblock %}
+{% block title %}Catálogo · Plataforma de Entradas{% endblock %}
 
 {% block content %}
-    <h1>Plataforma de Venta de Entradas</h1>
-    <p>
-        Backend desarrollado con Django REST Framework y PostgreSQL para la
-        evaluación EVA-2. Gestión de eventos, sectores, carro persistente,
-        checkout transaccional y emisión de entradas con UUID.
-    </p>
+    <section class="hero">
+        <h1>Vive el concierto. Asegura tu entrada.</h1>
+        <p>
+            Explora los eventos disponibles, elige tu sector y compra tus entradas.
+            Tu carro queda guardado en la base de datos aunque cierres sesión.
+        </p>
+    </section>
 
-    <div class="card">
-        <h2>Recursos de la API</h2>
-        <ul>
-            <li><a href="/api/docs/">Documentación Swagger / OpenAPI</a></li>
-            <li><a href="/api/status/">Estado del sistema y datos del alumno</a></li>
-            <li><a href="/api/eventos/">Catálogo de eventos (público)</a></li>
-            <li><a href="/api/auth/login/">Autenticación JWT</a></li>
-        </ul>
-    </div>
+    <form class="filters" method="get" action="{% url 'web:home' %}">
+        <div>
+            <label for="q">Buscar</label>
+            <input id="q" type="search" name="q" value="{{ filters.q }}" placeholder="Evento, artista o recinto">
+        </div>
+        <div>
+            <label for="venue">Recinto</label>
+            <select id="venue" name="venue">
+                <option value="">Todos</option>
+                {% for venue in venues %}
+                    <option value="{{ venue.id }}" {% if filters.venue == venue.id|stringformat:'s' %}selected{% endif %}>
+                        {{ venue.name }} — {{ venue.city }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="price_min">Precio mín.</label>
+            <input id="price_min" type="number" name="price_min" min="0" value="{{ filters.price_min }}">
+        </div>
+        <div>
+            <label for="price_max">Precio máx.</label>
+            <input id="price_max" type="number" name="price_max" min="0" value="{{ filters.price_max }}">
+        </div>
+        <button class="btn btn-primary" type="submit">Filtrar</button>
+        <a class="btn btn-ghost" href="{% url 'web:home' %}">Limpiar</a>
+    </form>
 
-    <div class="card">
-        <h2>Endpoints principales</h2>
-        <p><code>GET /api/eventos/</code> · <code>GET /api/eventos/{id}/sectores/</code></p>
-        <p><code>GET/POST /api/carro-tickets/</code> · <code>DELETE /api/carro-tickets/{id}/</code></p>
-        <p><code>POST /api/compras/pagar/</code> · <code>PATCH /api/compras/{id}/estado/</code></p>
-        <p><code>GET /api/mis-entradas/</code></p>
-    </div>
+    {% if events %}
+        <div class="grid">
+            {% for event in events %}
+                <article class="card event-card">
+                    <span class="event-date">{{ event.date|date:"d M Y · H:i" }}</span>
+                    <h2>
+                        <a href="{% url 'web:event_detail' event.id %}">{{ event.title }}</a>
+                    </h2>
+                    <p class="muted">{{ event.venue.name }} · {{ event.venue.city }}</p>
+                    <p class="muted clamp">{{ event.description }}</p>
+                    <div class="card-footer">
+                        <span class="pill">{{ event.sector_count }} sector{{ event.sector_count|pluralize:"es" }}</span>
+                        {% if event.min_price %}
+                            <span class="price">Desde ${{ event.min_price }}</span>
+                        {% else %}
+                            <span class="muted">Sin sectores</span>
+                        {% endif %}
+                    </div>
+                    <a class="btn btn-primary btn-block" href="{% url 'web:event_detail' event.id %}">
+                        Ver sectores
+                    </a>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty">
+            No hay eventos que coincidan con los filtros.
+            <p><a href="{% url 'web:home' %}">Ver todo el catálogo</a></p>
+        </div>
+    {% endif %}
 {% endblock %}

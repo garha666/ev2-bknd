@@ -1,0 +1,54 @@
+{% extends "tickets/base.html" %}
+
+{% block title %}{{ event.title }} · Plataforma de Entradas{% endblock %}
+
+{% block content %}
+    <a class="back" href="{% url 'web:home' %}">← Volver al catálogo</a>
+
+    <section class="card">
+        <span class="pill">{{ event.date|date:"d M Y · H:i" }}</span>
+        <h1>{{ event.title }}</h1>
+        <p class="muted">
+            {{ event.venue.name }} · {{ event.venue.address }}, {{ event.venue.city }}
+        </p>
+        <p>{{ event.description }}</p>
+    </section>
+
+    <h2>Sectores y disponibilidad</h2>
+
+    {% if sectors %}
+        <div class="grid">
+            {% for sector in sectors %}
+                <article class="card event-card">
+                    <h3>{{ sector.name }}</h3>
+                    <p class="price">${{ sector.price }}</p>
+                    <p class="muted">
+                        Stock disponible: {{ sector.available_stock }} / {{ sector.capacity }}
+                    </p>
+
+                    {% if sector.available_stock > 0 %}
+                        {% if user.is_authenticated %}
+                            <form class="inline-form" method="post" action="{% url 'web:add_to_cart' sector.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="event_id" value="{{ event.id }}">
+                                <label>
+                                    Cantidad
+                                    <input type="number" name="quantity" value="1" min="1" max="{{ sector.available_stock }}">
+                                </label>
+                                <button class="btn btn-primary" type="submit">Agregar al carro</button>
+                            </form>
+                        {% else %}
+                            <a class="btn btn-primary" href="{% url 'web:login' %}?next={% url 'web:event_detail' event.id %}">
+                                Inicia sesión para comprar
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <span class="badge badge-CANCELADO">Agotado</span>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty">Este evento todavía no tiene sectores cargados.</div>
+    {% endif %}
+{% endblock %}

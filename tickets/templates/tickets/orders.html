@@ -1,0 +1,57 @@
+{% extends "tickets/base.html" %}
+
+{% block title %}Mis órdenes · Plataforma de Entradas{% endblock %}
+
+{% block content %}
+    <h1>Mis órdenes</h1>
+
+    {% for order in orders %}
+        <article class="card order-card">
+            <header>
+                <div>
+                    <strong>Orden #{{ order.id }}</strong>
+                    <span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span>
+                </div>
+                <span class="muted">{{ order.created_at|date:"d M Y · H:i" }}</span>
+            </header>
+
+            <ul class="order-items">
+                {% for item in order.items.all %}
+                    <li>
+                        <span>{{ item.quantity }} × {{ item.sector.name }} — {{ item.sector.event.title }}</span>
+                        <span>${{ item.subtotal }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div class="order-footer">
+                <span class="price">Total: ${{ order.total_amount }}</span>
+                <div class="actions">
+                    {% if order.status == 'PENDIENTE' %}
+                        <form method="post" action="{% url 'web:pay_order' order.id %}">
+                            {% csrf_token %}
+                            <button class="btn btn-primary" type="submit">Pagar</button>
+                        </form>
+                    {% endif %}
+
+                    {% if order.status != 'CANCELADO' %}
+                        <form method="post" action="{% url 'web:cancel_order' order.id %}"
+                              onsubmit="return confirm('¿Cancelar esta orden?');">
+                            {% csrf_token %}
+                            <button class="btn btn-danger" type="submit">Cancelar</button>
+                        </form>
+                    {% endif %}
+
+                    {% if order.status == 'PAGADO' or order.status == 'ENTREGADO' %}
+                        <a class="btn btn-ghost" href="{% url 'web:my_tickets' %}">Ver entradas</a>
+                    {% endif %}
+                </div>
+            </div>
+        </article>
+    {% empty %}
+        <div class="empty">
+            Todavía no tienes órdenes.
+            <p><a href="{% url 'web:home' %}">Explorar eventos</a></p>
+        </div>
+    {% endfor %}
+{% endblock %}

@@ -48,11 +48,48 @@ python manage.py runserver
 
 | Recurso | URL |
 |---|---|
+| Catálogo HTML | `http://127.0.0.1:8000/` |
+| Detalle de evento | `http://127.0.0.1:8000/eventos/{id}/` |
+| Carro | `http://127.0.0.1:8000/carro/` |
+| Mis órdenes | `http://127.0.0.1:8000/mis-ordenes/` |
+| Mis entradas | `http://127.0.0.1:8000/mis-entradas/` |
+| Login / Registro | `/login/` · `/registro/` |
+| Panel organizador (staff) | `http://127.0.0.1:8000/panel/` |
 | Swagger / OpenAPI | `http://127.0.0.1:8000/api/docs/` |
 | Esquema OpenAPI | `http://127.0.0.1:8000/api/schema/` |
 | Estado y datos del alumno | `http://127.0.0.1:8000/api/status/` |
-| Vista HTML con footer | `http://127.0.0.1:8000/` |
 | Administración Django | `http://127.0.0.1:8000/admin/` |
+
+## Datos de demostración
+
+```bash
+python manage.py seed_demo
+```
+
+Crea recintos, eventos, sectores y dos usuarios de prueba:
+
+| Usuario | Contraseña | Rol |
+|---|---|---|
+| `espectador` | `espectador123` | Espectador |
+| `organizador` | `organizador123` | Organizador (staff) |
+
+## Interfaz web
+
+La web usa **sesión de Django** (formularios HTML) y la API sigue usando **JWT**.
+Ambas capas comparten la misma lógica de negocio (`tickets/services.py`), por lo
+que el control de stock, checkout y emisión de tickets es idéntico.
+
+Flujo del espectador:
+1. Registrarse o iniciar sesión.
+2. Explorar el catálogo y filtrar por recinto o rango de precios.
+3. Agregar sectores al carro (persistente en PostgreSQL).
+4. Generar la orden (queda `PENDIENTE`).
+5. Pagar la orden: descuenta stock y emite tickets con UUID.
+6. Revisar las entradas en “Mis entradas”.
+
+El organizador puede crear eventos/sectores y cambiar el estado de las órdenes
+desde `/panel/` o desde el admin de Django.
+
 
 ## Endpoints principales
 
@@ -106,11 +143,17 @@ python manage.py spectacular --file schema.yaml --validate
 ticket_project/        Configuración Django y rutas raíz
 tickets/
   models.py            Venue, Event, Sector, Cart, CartItem, Order, OrderItem, Ticket
+  services.py          Lógica transaccional compartida (carro, pago, stock)
+  filters.py           Filtros django-filter del catálogo
   serializers.py       Serialización y claims JWT
-  views.py             ViewSets y lógica transaccional
+  views.py             API REST (ViewSets)
+  web_views.py         Vistas HTML (catálogo, carro, órdenes, panel)
+  forms.py             Formularios HTML
   urls.py              Rutas de la API
+  web_urls.py          Rutas del frontend HTML
   constants.py         Datos del alumno
-  templates/tickets/   Vista HTML base con footer
+  templates/tickets/   Plantillas HTML con footer
+  management/commands/ seed_demo.py
   tests*.py            Pruebas automatizadas
 docs/                  Documentación de la metodología
 specs/                 Especificación, plan y tareas

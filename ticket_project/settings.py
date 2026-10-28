@@ -80,6 +80,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'tickets.context_processors.alumno_context',
             ],
         },
     },
@@ -182,3 +183,8 @@ CORS_ALLOW_ALL_ORIGINS = os.environ.get(
 ).lower() in ('1', 'true', 'yes')  # Permite todas las peticiones durante el desarrollo
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Autenticación de la web (sesión de Django)
+LOGIN_URL = 'web:login'
+LOGIN_REDIRECT_URL = 'web:home'
+LOGOUT_REDIRECT_URL = 'web:home'

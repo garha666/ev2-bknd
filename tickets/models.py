@@ -128,6 +128,11 @@ class CartItem(models.Model):
             f"in {self.cart.user.username}'s cart"
         )
 
+    @property
+    def subtotal(self):
+        """Valor de la línea (cantidad por precio unitario del sector)."""
+        return self.quantity * self.sector.price
+
 
 # ============================================================================
 # 5. Orden de compra (control transaccional e histórico de precios)
@@ -178,6 +183,11 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity}x {self.sector.name} (Orden #{self.order.id})"
+
+    @property
+    def subtotal(self):
+        """Valor histórico de la línea (cantidad por precio congelado)."""
+        return self.quantity * self.unit_price
 
 
 # ============================================================================
