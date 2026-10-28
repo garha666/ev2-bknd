@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Event, Order, Sector
+from .models import Event, Order, Sector, Venue
 
 
 class LoginForm(AuthenticationForm):
@@ -55,6 +55,14 @@ class EventForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['date'].input_formats = ['%Y-%m-%dT%H:%M']
+
+
+class VenueForm(forms.ModelForm):
+    """Alta de recintos desde el panel del organizador."""
+
+    class Meta:
+        model = Venue
+        fields = ['name', 'address', 'city', 'capacity']
 
 
 class SectorForm(forms.ModelForm):

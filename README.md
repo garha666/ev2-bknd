@@ -87,8 +87,8 @@ Flujo del espectador:
 5. Pagar la orden: descuenta stock y emite tickets con UUID.
 6. Revisar las entradas en “Mis entradas”.
 
-El organizador puede crear eventos/sectores y cambiar el estado de las órdenes
-desde `/panel/` o desde el admin de Django.
+El organizador puede crear recintos, eventos y sectores, además de cambiar el
+estado de las órdenes desde `/panel/` o desde el admin de Django.
 
 
 ## Endpoints principales

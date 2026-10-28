@@ -103,3 +103,35 @@ class WebViewsTests(TestCase):
 
         response = self.client.get(reverse('web:panel'))
         self.assertEqual(response.status_code, 302)
+
+    def _login_organizador(self):
+        User.objects.create_user(
+            username='organizador',
+            password='ClaveSegura123!',
+            is_staff=True,
+        )
+        self.client.login(username='organizador', password='ClaveSegura123!')
+
+    def test_panel_muestra_formulario_para_crear_recinto(self):
+        self._login_organizador()
+
+        response = self.client.get(reverse('web:panel'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Crear recinto')
+        self.assertContains(response, 'Crear evento')
+
+    def test_panel_crea_recinto(self):
+        self._login_organizador()
+
+        response = self.client.post(reverse('web:panel_venue_create'), {
+            'name': 'Estadio Nuevo',
+            'address': 'Calle 123',
+            'city': 'Valparaíso',
+            'capacity': 2000,
+        })
+
+        self.assertRedirects(response, reverse('web:panel'))
+        venue = Venue.objects.get(name='Estadio Nuevo')
+        self.assertEqual(venue.city, 'Valparaíso')
+        self.assertEqual(venue.capacity, 2000)

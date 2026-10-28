@@ -24,6 +24,7 @@ from .forms import (
     OrderStatusForm,
     RegisterForm,
     SectorForm,
+    VenueForm,
 )
 from .models import Cart, Event, Order, Ticket, Venue
 
@@ -313,6 +314,8 @@ def panel(request):
         'events': events,
         'orders_with_forms': orders_with_forms,
         'event_form': EventForm(),
+        'venue_form': VenueForm(),
+        'venues': Venue.objects.annotate(event_count=Count('events')).order_by('name'),
         'sector_form': SectorForm(),
     })
 
@@ -345,6 +348,18 @@ def panel_event_create(request):
         messages.success(request, f'Evento "{event.title}" creado.')
     else:
         messages.error(request, f'No se pudo crear el evento: {form.errors.as_text()}')
+    return redirect('web:panel')
+
+
+@user_passes_test(_is_staff, login_url='web:login')
+@require_POST
+def panel_venue_create(request):
+    form = VenueForm(request.POST)
+    if form.is_valid():
+        venue = form.save()
+        messages.success(request, f'Recinto "{venue.name}" creado.')
+    else:
+        messages.error(request, f'No se pudo crear el recinto: {form.errors.as_text()}')
     return redirect('web:panel')
 
 

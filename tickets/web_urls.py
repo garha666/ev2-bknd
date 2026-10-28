@@ -32,5 +32,6 @@ urlpatterns = [
     path('panel/', web_views.panel, name='panel'),
     path('panel/ordenes/<int:pk>/estado/', web_views.panel_order_status, name='panel_order_status'),
     path('panel/eventos/crear/', web_views.panel_event_create, name='panel_event_create'),
+    path('panel/recintos/crear/', web_views.panel_venue_create, name='panel_venue_create'),
     path('panel/sectores/crear/', web_views.panel_sector_create, name='panel_sector_create'),
 ]
